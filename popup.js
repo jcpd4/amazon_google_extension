@@ -49,13 +49,18 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!infoBox) {
         infoBox = document.createElement('div');
         infoBox.id = 'infoBox';
-        infoBox.style.width = '100%';  // Ocupa todo el ancho de la página
-        infoBox.style.padding = '10px';
-        infoBox.style.backgroundColor = '#fff';
-        infoBox.style.border = '2px solid #ddd';
-        infoBox.style.marginBottom = '20px'; // Espacio entre el cuadro y el producto
-        infoBox.style.boxSizing = 'border-box';
+        infoBox.style.fontFamily = "'Poppins', sans-serif";  // Nueva fuente elegante
+        infoBox.style.width = '100%';  // Ocupa todo el ancho del contenedor
+        infoBox.style.padding = '15px';  // Un poco más de padding para que el contenido respire
+        infoBox.style.backgroundColor = '#f3e5f5';  // Un lila claro y suave
+        infoBox.style.border = '1px solid #d1c4e9';  // Un borde lila más oscuro pero sutil
+        infoBox.style.borderRadius = '10px';  // Bordes redondeados para un toque suave
+        infoBox.style.marginBottom = '20px';  // Espacio entre el cuadro y el contenido
+        infoBox.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';  // Sombra ligera para que destaque
+        infoBox.style.boxSizing = 'border-box';  // Asegura que el padding no afecte el ancho total
+        infoBox.style.color = '#673ab7';  // Texto en un lila más intenso para buen contraste
         productContainer.before(infoBox); // Insertar antes del contenedor del producto con id 'ppd'
+      
       }
   
       infoBox.innerHTML = `
