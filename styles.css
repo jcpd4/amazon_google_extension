@@ -20,3 +20,23 @@ html body #infoBox{
 }
 
 */
+
+
+/* PARTE GRAFICA */
+#chartContainer {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  height: 200px;
+  margin-top: 20px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.chartBar {
+  width: 20px;
+  margin-right: 10px;
+  background-color: #673ab7;  /* Lila oscuro */
+  transition: height 0.3s;
+}
