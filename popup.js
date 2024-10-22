@@ -126,7 +126,7 @@ function toggleAmazonInfoBox(isActive) {
       // Mostrar las reseñas en formato de tabla
       const latestReviews = document.getElementById('latestReviews');
       if (latestReviews) {
-          const reviews = document.querySelectorAll('.review'); // Modificar según el selector real de las reseñas
+          const reviews = Array.from(document.querySelectorAll('.review')).slice(0, 15); // Modificar según el selector real de las reseñas y limitar a 15
           if (reviews.length === 0) {
               latestReviews.innerHTML = '<p>No hay reseñas disponibles.</p>';
           } else {
@@ -139,11 +139,10 @@ function toggleAmazonInfoBox(isActive) {
               table += '<th style="padding: 10px; border: 1px solid #673ab7;">Fotos</th>';
               table += '</tr></thead><tbody>';
 
-              reviews.forEach(review => {
+              reviews.slice(0, 5).forEach(review => {
                   const date = review.querySelector('.review-date')?.innerText.trim() || 'Fecha no disponible';
-                  const rating = review.querySelector('.review-rating')?.innerText.trim().slice(0, 3) || 'Valoración no disponible';
-                  // para sacar solo el titulo
-                  const title = review.querySelector('.review-title span + span')?.innerText.trim() || 'Título no disponible';
+                  const rating = review.querySelector('.review-rating')?.innerText.trim() || 'Valoración no disponible';
+                  const title = review.querySelector('.review-title-content span')?.innerText.trim() || 'Título no disponible';
                   const description = review.querySelector('.review-text')?.innerText.trim() || 'Descripción no disponible';
                   const photos = Array.from(review.querySelectorAll('.review-photo')).map(photo => `<img src="${photo.src}" alt="foto de reseña" style="width: 50px; height: 50px;">`).join(' ') || 'Sin fotos';
 
@@ -156,7 +155,58 @@ function toggleAmazonInfoBox(isActive) {
                   table += `</tr>`;
               });
               table += '</tbody></table>';
-              latestReviews.innerHTML += table;
+
+              // Añadir controles de navegación
+              latestReviews.innerHTML = `
+                  <div style="overflow: auto; max-height: 400px;">
+                      ${table}
+                  </div>
+                  <button id="prevReviews" style="margin-top: 10px; padding: 10px 20px; background-color: #673ab7; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Anterior</button>
+                  <button id="nextReviews" style="margin-top: 10px; padding: 10px 20px; background-color: #673ab7; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Siguiente</button>
+              `;
+
+              let currentPage = 0;
+
+              function renderReviews(page) {
+                  const start = page * 5;
+                  const end = start + 5;
+                  const currentReviews = reviews.slice(start, end);
+
+                  let rows = '';
+                  currentReviews.forEach(review => {
+                      const date = review.querySelector('.review-date')?.innerText.trim() || 'Fecha no disponible';
+                      const rating = review.querySelector('.review-rating')?.innerText.trim() || 'Valoración no disponible';
+                      const title = review.querySelector('.review-title-content span')?.innerText.trim() || 'Título no disponible';
+                      const description = review.querySelector('.review-text')?.innerText.trim() || 'Descripción no disponible';
+                      const photos = Array.from(review.querySelectorAll('.review-photo')).map(photo => `<img src="${photo.src}" alt="foto de reseña" style="width: 50px; height: 50px;">`).join(' ') || 'Sin fotos';
+
+                      rows += `<tr>`;
+                      rows += `<td style="padding: 10px; border: 1px solid #673ab7;">${date}</td>`;
+                      rows += `<td style="padding: 10px; border: 1px solid #673ab7;">${rating}</td>`;
+                      rows += `<td style="padding: 10px; border: 1px solid #673ab7;">${title}</td>`;
+                      rows += `<td style="padding: 10px; border: 1px solid #673ab7;">${description}</td>`;
+                      rows += `<td style="padding: 10px; border: 1px solid #673ab7;">${photos}</td>`;
+                      rows += `</tr>`;
+                  });
+                  latestReviews.querySelector('tbody').innerHTML = rows;
+              }
+
+              document.getElementById('prevReviews').addEventListener('click', function () {
+                  if (currentPage > 0) {
+                      currentPage--;
+                      renderReviews(currentPage);
+                  }
+              });
+
+              document.getElementById('nextReviews').addEventListener('click', function () {
+                  if ((currentPage + 1) * 5 < reviews.length) {
+                      currentPage++;
+                      renderReviews(currentPage);
+                  }
+              });
+
+              // Renderizar la primera página de reseñas
+              renderReviews(currentPage);
           }
       }
   } else {
