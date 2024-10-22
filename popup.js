@@ -35,7 +35,7 @@ function toggleAmazonInfoBox(isActive) {
             <p><strong>Precio:</strong> ${productPrice}</p>
             <p><strong>Reseñas:</strong> ${productReviews}</p>
             <h3>Gráfico de Ventas</h3>
-            <canvas id="salesChart" width="800" height="300" style="margin: 10px;"></canvas>
+            <canvas id="salesChart" style="margin: 10px; width: 100%; height: 300px;"></canvas>
             <h3>Últimas Reseñas</h3>
             <div id="latestReviews"></div>
         `;
@@ -44,20 +44,28 @@ function toggleAmazonInfoBox(isActive) {
         const canvas = document.getElementById('salesChart');
         if (canvas && canvas.getContext) {
             const ctx = canvas.getContext('2d');
-            // Datos ficticios de ventas
-            const salesData = [12, 19, 3, 5, 2, 3, 15];
-            const days = [1, 2, 3, 4, 5, 6, 7];
-  
+
+            // Ajustar el tamaño del canvas al ancho del contenedor
+            canvas.width = canvas.parentElement.clientWidth; // Ajuste dinámico del ancho
+            canvas.height = 300; // Mantener la altura fija
+
+            // Datos ficticios de ventas para 30 días
+            const salesData = [
+                12, 19, 3, 5, 2, 3, 15, 10, 8, 22, 17, 6, 9, 23, 11, 5, 13, 18, 20, 9,
+                7, 25, 12, 14, 8, 19, 16, 10, 12, 22
+            ]; // Ventas para 30 días
+            const days = Array.from({ length: 30 }, (_, i) => i + 1); // Días del 1 al 30
+
             // Ajustar márgenes
             const margin = 50;
             const chartWidth = canvas.width - margin * 2;
             const chartHeight = canvas.height - margin * 2;
             let tooltipVisible = false; // Declarar aquí para que sea accesible
-  
+
             function drawChart() {
                 // Limpiar el canvas
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
+
                 // Dibujar ejes X e Y
                 ctx.strokeStyle = '#000';
                 ctx.lineWidth = 1;
@@ -71,7 +79,7 @@ function toggleAmazonInfoBox(isActive) {
                 ctx.moveTo(margin, margin);
                 ctx.lineTo(margin, chartHeight + margin);
                 ctx.stroke();
-  
+
                 // Dibujar etiquetas en los ejes
                 ctx.fillStyle = '#000';
                 ctx.font = '12px Arial';
@@ -85,7 +93,7 @@ function toggleAmazonInfoBox(isActive) {
                     const y = chartHeight + margin - (i * chartHeight / 4);
                     ctx.fillText(`${i * 5}`, margin - 30, y + 5);
                 }
-  
+
                 // Dibujar líneas intermedias en el eje Y
                 ctx.strokeStyle = '#ccc';
                 ctx.lineWidth = 0.5;
@@ -96,7 +104,7 @@ function toggleAmazonInfoBox(isActive) {
                     ctx.lineTo(chartWidth + margin, y);
                     ctx.stroke();
                 }
-  
+
                 // Dibujar el gráfico de puntos conectados por líneas
                 ctx.beginPath();
                 ctx.moveTo(margin, chartHeight + margin - salesData[0] * 10);
@@ -108,7 +116,7 @@ function toggleAmazonInfoBox(isActive) {
                 ctx.strokeStyle = '#673ab7';
                 ctx.lineWidth = 2;
                 ctx.stroke();
-  
+
                 // Dibujar puntos
                 ctx.fillStyle = '#673ab7';
                 for (let i = 0; i < salesData.length; i++) {
@@ -127,12 +135,17 @@ function toggleAmazonInfoBox(isActive) {
                 const mouseY = event.clientY - rect.top;
                 let hovered = false;
                 
+                // Ampliar el radio de detección para el tooltip
+                const detectionRadius = 10; // Aumentar el radio de detección a 10 px
+                
                 // Verificar si el mouse está sobre un punto
                 for (let i = 0; i < salesData.length; i++) {
                     const x = margin + (chartWidth / (days.length - 1)) * i;
                     const y = chartHeight + margin - salesData[i] * 10;
                     const distance = Math.sqrt((mouseX - x) ** 2 + (mouseY - y) ** 2);
-                    if (distance < 7) {
+                    
+                    // Si el mouse está dentro del área de detección del punto
+                    if (distance < detectionRadius) {
                         hovered = true;
                         if (!tooltipVisible) {
                             tooltipVisible = true;
@@ -148,13 +161,15 @@ function toggleAmazonInfoBox(isActive) {
                     }
                 }
                 
+                // Si el mouse no está sobre ningún punto, ocultar el tooltip
                 if (!hovered && tooltipVisible) {
                     tooltipVisible = false;
                     canvas.style.cursor = 'default';
                     drawChart(); // Redibujar el gráfico para eliminar el tooltip
                 }
             });
-  
+
+
             // Dibujar el gráfico inicialmente
             drawChart();
         }
@@ -295,8 +310,6 @@ function toggleAmazonInfoBox(isActive) {
         }
     }
 }
-
-
 
 document.addEventListener('DOMContentLoaded', function () {
 const toggleButton = document.getElementById('toggleExtension');
