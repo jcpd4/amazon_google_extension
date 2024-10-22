@@ -175,8 +175,8 @@ function toggleAmazonInfoBox(isActive) {
                   let rows = '';
                   currentReviews.forEach(review => {
                       const date = review.querySelector('.review-date')?.innerText.trim() || 'Fecha no disponible';
-                      const rating = review.querySelector('.review-rating')?.innerText.trim() || 'Valoración no disponible';
-                      const title = review.querySelector('.review-title-content span')?.innerText.trim() || 'Título no disponible';
+                      const rating = review.querySelector('.review-rating')?.innerText.trim().slice(0,3) || 'Valoración no disponible';
+                      const title = review.querySelector('.review-title-content span + span')?.innerText.trim() || 'Título no disponible';
                       const description = review.querySelector('.review-text')?.innerText.trim() || 'Descripción no disponible';
                       const photos = Array.from(review.querySelectorAll('.review-photo')).map(photo => `<img src="${photo.src}" alt="foto de reseña" style="width: 50px; height: 50px;">`).join(' ') || 'Sin fotos';
 
