@@ -164,6 +164,47 @@ function toggleAmazonInfoBox(isActive) {
                   <button id="prevReviews" style="margin-top: 10px; padding: 10px 20px; background-color: #673ab7; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Anterior</button>
                   <button id="nextReviews" style="margin-top: 10px; padding: 10px 20px; background-color: #673ab7; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Siguiente</button>
               `;
+              // Añadir el botón "Descargar CSV"
+              const downloadButton = document.createElement('button');
+              downloadButton.textContent = 'Descargar CSV';
+              downloadButton.id = 'downloadCsvButton';
+              downloadButton.style.marginTop = '10px';
+              downloadButton.style.padding = '10px 20px';
+              downloadButton.style.backgroundColor = '#673ab7';
+              downloadButton.style.color = '#fff';
+              downloadButton.style.border = 'none';
+              downloadButton.style.borderRadius = '5px';
+              downloadButton.style.cursor = 'pointer';
+              latestReviews.prepend(downloadButton);
+
+              downloadButton.addEventListener('click', function () {
+                  const reviews = Array.from(document.querySelectorAll('.review')).slice(0, 15);
+                  if (reviews.length === 0) {
+                      alert('No hay reseñas disponibles para descargar.');
+                      return;
+                  }
+
+                  let csvContent = 'Fecha,Valoración,Título,Descripción,Fotos\n';
+
+                  reviews.forEach(review => {
+                      const date = review.querySelector('.review-date')?.innerText.trim() || 'Fecha no disponible';
+                      const rating = review.querySelector('.review-rating')?.innerText.trim().slice(0, 3) || 'Valoración no disponible';
+                      const title = review.querySelector('.review-title-content span')?.innerText.trim() || 'Título no disponible';
+                      const description = review.querySelector('.review-text')?.innerText.trim() || 'Descripción no disponible';
+                      const photos = Array.from(review.querySelectorAll('.review-photo')).map(photo => photo.src).join(' ') || 'Sin fotos';
+
+                      csvContent += `"${date}","${rating}","${title}","${description}","${photos}"\n`;
+                  });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'reseñas.csv';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
 
               let currentPage = 0;
 
