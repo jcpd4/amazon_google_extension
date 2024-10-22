@@ -38,7 +38,6 @@ function toggleAmazonInfoBox(isActive) {
           <canvas id="salesChart" width="800" height="300" style="margin: 10px;"></canvas>
           <h3>Últimas Reseñas</h3>
           <div id="latestReviews"></div>
-          <button id="seeMoreReviews" style="margin-top: 15px; padding: 10px 20px; background-color: #673ab7; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Ver más reseñas</button>
       `;
 
       // Crear el gráfico usando canvas
@@ -117,79 +116,49 @@ function toggleAmazonInfoBox(isActive) {
                   ctx.beginPath();
                   ctx.arc(x, y, 5, 0, 2 * Math.PI);
                   ctx.fill();
-                  points.push({ x, y, data: `Día ${days[i]} - Ventas: ${salesData[i]}` });
               }
           }
 
           // Dibujar el gráfico inicialmente
-          const points = [];
           drawChart();
-
-          // Evento para mostrar información cuando el mouse pasa sobre un punto
-          canvas.addEventListener('mousemove', function (event) {
-              const rect = canvas.getBoundingClientRect();
-              const mouseX = event.clientX - rect.left;
-              const mouseY = event.clientY - rect.top;
-
-              // Redibujar el gráfico completo
-              drawChart();
-
-              // Mostrar tooltip si el mouse está cerca de un punto
-              for (let point of points) {
-                  if (Math.abs(mouseX - point.x) < 10 && Math.abs(mouseY - point.y) < 10) {
-                      // Dibujar tooltip con estilo mejorado
-                      const tooltipWidth = 140;
-                      const tooltipHeight = 30;
-                      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-                      ctx.strokeStyle = '#673ab7';
-                      ctx.lineWidth = 1;
-                      ctx.fillRect(point.x + 10, point.y - tooltipHeight - 10, tooltipWidth, tooltipHeight);
-                      ctx.strokeRect(point.x + 10, point.y - tooltipHeight - 10, tooltipWidth, tooltipHeight);
-
-                      // Dibujar contenido del tooltip
-                      ctx.fillStyle = '#673ab7';
-                      ctx.font = 'bold 12px Poppins';
-                      ctx.fillText(point.data, point.x + 15, point.y - tooltipHeight / 2);
-                  }
-              }
-          });
       }
 
-      // Mostrar las últimas 5 reseñas
-      const latestReviewsContainer = document.getElementById('latestReviews');
-      if (latestReviewsContainer) {
+      // Mostrar las reseñas en formato de tabla
+      const latestReviews = document.getElementById('latestReviews');
+      if (latestReviews) {
           const reviews = document.querySelectorAll('.review'); // Modificar según el selector real de las reseñas
           if (reviews.length === 0) {
-              latestReviewsContainer.innerHTML = '<p>No hay reseñas disponibles.</p>';
+              latestReviews.innerHTML = '<p>No hay reseñas disponibles.</p>';
           } else {
-              let latestReviews = '';
-              reviews.forEach((review, index) => {
-                  if (index < 5) {
-                      const date = review.querySelector('.review-date')?.innerText.trim() || 'Fecha no disponible';
-                      const rating = review.querySelector('.review-rating')?.innerText.trim() || 'Valoración no disponible';
-                      const title = review.querySelector('.review-title')?.innerText.trim() || 'Título no disponible';
-                      const description = review.querySelector('.review-text')?.innerText.trim() || 'Descripción no disponible';
-                      latestReviews += `
-                          <div style="margin-bottom: 10px;">
-                              <p><strong>Fecha:</strong> ${date}</p>
-                              <p><strong>Valoración:</strong> ${rating}</p>
-                              <p><strong>Título:</strong> ${title}</p>
-                              <p><strong>Descripción:</strong> ${description}</p>
-                          </div>
-                      `;
-                  }
+              let table = '<table style="width: 100%; border-collapse: collapse; border: 1px solid #673ab7; margin-top: 15px;">';
+              table += '<thead><tr style="background-color: #673ab7; color: #fff;">';
+              table += '<th style="padding: 10px; border: 1px solid #673ab7;">Fecha</th>';
+              table += '<th style="padding: 10px; border: 1px solid #673ab7;">Valoración</th>';
+              table += '<th style="padding: 10px; border: 1px solid #673ab7;">Título</th>';
+              table += '<th style="padding: 10px; border: 1px solid #673ab7;">Descripción</th>';
+              table += '<th style="padding: 10px; border: 1px solid #673ab7;">Fotos</th>';
+              table += '</tr></thead><tbody>';
+
+              reviews.forEach(review => {
+                  const date = review.querySelector('.review-date')?.innerText.trim() || 'Fecha no disponible';
+                  const rating = review.querySelector('.review-rating')?.innerText.trim().slice(0, 3) || 'Valoración no disponible';
+                  // para sacar solo el titulo
+                  const title = review.querySelector('.review-title span + span')?.innerText.trim() || 'Título no disponible';
+                  const description = review.querySelector('.review-text')?.innerText.trim() || 'Descripción no disponible';
+                  const photos = Array.from(review.querySelectorAll('.review-photo')).map(photo => `<img src="${photo.src}" alt="foto de reseña" style="width: 50px; height: 50px;">`).join(' ') || 'Sin fotos';
+
+                  table += `<tr>`;
+                  table += `<td style="padding: 10px; border: 1px solid #673ab7;">${date}</td>`;
+                  table += `<td style="padding: 10px; border: 1px solid #673ab7;">${rating}</td>`;
+                  table += `<td style="padding: 10px; border: 1px solid #673ab7;">${title}</td>`;
+                  table += `<td style="padding: 10px; border: 1px solid #673ab7;">${description}</td>`;
+                  table += `<td style="padding: 10px; border: 1px solid #673ab7;">${photos}</td>`;
+                  table += `</tr>`;
               });
-              latestReviewsContainer.innerHTML = latestReviews;
+              table += '</tbody></table>';
+              latestReviews.innerHTML += table;
           }
       }
-
-      // Manejar clic en el botón "Ver más reseñas"
-      document.getElementById('seeMoreReviews')?.addEventListener('click', function () {
-          const tabReviewsButton = document.getElementById('tabReviews');
-          if (tabReviewsButton) {
-              tabReviewsButton.click();
-          }
-      });
   } else {
       const infoBox = document.getElementById('infoBox');
       if (infoBox) {
@@ -200,31 +169,7 @@ function toggleAmazonInfoBox(isActive) {
 
 document.addEventListener('DOMContentLoaded', function () {
   const toggleButton = document.getElementById('toggleExtension');
-  const tabInfoButton = document.getElementById('tabInfo');
-  const tabReviewsButton = document.getElementById('tabReviews');
-  const infoContainer = document.getElementById('infoContainer');
-  const reviewsContainer = document.getElementById('reviewsContainer');
-
-  // Verificar si los elementos existen antes de acceder a sus propiedades
-  if (infoContainer && reviewsContainer) {
-      // Mostrar la pestaña de información inicialmente
-      infoContainer.style.display = 'block';
-      reviewsContainer.style.display = 'none';
-
-      // Manejar clic en el botón de pestaña Info
-      tabInfoButton?.addEventListener('click', function () {
-          infoContainer.style.display = 'block';
-          reviewsContainer.style.display = 'none';
-      });
-
-      // Manejar clic en el botón de pestaña Reseñas
-      tabReviewsButton?.addEventListener('click', function () {
-          infoContainer.style.display = 'none';
-          reviewsContainer.style.display = 'block';
-          fetchReviews();
-      });
-  }
-
+  
   // Cargar el estado actual
   chrome.storage.local.get(['isExtensionActive'], function (result) {
       if (result.isExtensionActive) {
@@ -253,61 +198,4 @@ document.addEventListener('DOMContentLoaded', function () {
           });
       });
   });
-
-  function fetchReviews() {
-      const reviewsContainer = document.getElementById('reviewsContainer');
-      if (reviewsContainer) {
-          reviewsContainer.innerHTML = '<h2 style="font-size: 24px;">Reseñas del Producto</h2>';
-
-          const reviews = document.querySelectorAll('.review'); // Modificar según el selector real de las reseñas
-          if (reviews.length === 0) {
-              reviewsContainer.innerHTML += '<p>No hay reseñas disponibles.</p>';
-          } else {
-              let table = '<table style="width: 100%; border-collapse: collapse;"><tr><th>Fecha</th><th>Valoración</th><th>Título</th><th>Descripción</th><th>Fotos</th></tr>';
-              reviews.forEach(review => {
-                  const date = review.querySelector('.review-date')?.innerText.trim() || 'Fecha no disponible';
-                  const rating = review.querySelector('.review-rating')?.innerText.trim() || 'Valoración no disponible';
-                  const title = review.querySelector('.review-title')?.innerText.trim() || 'Título no disponible';
-                  const description = review.querySelector('.review-text')?.innerText.trim() || 'Descripción no disponible';
-                  const photos = Array.from(review.querySelectorAll('.review-photo')).map(photo => photo.src).join(', ') || 'Sin fotos';
-
-                  table += `<tr><td>${date}</td><td>${rating}</td><td>${title}</td><td>${description}</td><td>${photos}</td></tr>`;
-              });
-              table += '</table>';
-              reviewsContainer.innerHTML += table;
-              
-              // Añadir botón para descargar reseñas como Excel
-              const downloadButton = document.createElement('button');
-              downloadButton.textContent = 'Descargar Reseñas en Excel';
-              downloadButton.style.marginTop = '15px';
-              downloadButton.style.padding = '10px 20px';
-              downloadButton.style.backgroundColor = '#673ab7';
-              downloadButton.style.color = '#fff';
-              downloadButton.style.border = 'none';
-              downloadButton.style.borderRadius = '5px';
-              downloadButton.style.cursor = 'pointer';
-              reviewsContainer.appendChild(downloadButton);
-
-              downloadButton.addEventListener('click', function () {
-                  let csvContent = "data:text/csv;charset=utf-8,Fecha,Valoración,Título,Descripción,Fotos\n";
-                  reviews.forEach(review => {
-                      const date = review.querySelector('.review-date')?.innerText.trim() || 'Fecha no disponible';
-                      const rating = review.querySelector('.review-rating')?.innerText.trim() || 'Valoración no disponible';
-                      const title = review.querySelector('.review-title')?.innerText.trim() || 'Título no disponible';
-                      const description = review.querySelector('.review-text')?.innerText.trim() || 'Descripción no disponible';
-                      const photos = Array.from(review.querySelectorAll('.review-photo')).map(photo => photo.src).join(', ') || 'Sin fotos';
-
-                      csvContent += `${date},${rating},${title},${description},${photos}\n`;
-                  });
-                  const encodedUri = encodeURI(csvContent);
-                  const link = document.createElement('a');
-                  link.setAttribute('href', encodedUri);
-                  link.setAttribute('download', 'reseñas_producto.csv');
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
-              });
-          }
-      }
-  }
 });
